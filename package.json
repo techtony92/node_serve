@@ -1,0 +1,19 @@
+{
+  "name": "001-nodejs-the-beginning",
+  "version": "1.0.0",
+  "description": "",
+  "main": "simple server in node.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "supertest": "^6.3.3"
+  },
+  "dependencies": {
+    "jest": "^29.7.0"
+  }
+}
