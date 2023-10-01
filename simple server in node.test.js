@@ -11,6 +11,17 @@ const {request, http} = require("./simple server in node");
 //     });
 // })
 
+describe(`Should POST data to the endpoint and return a string as a response`, function(){
+    const mockData = {
+        data:"String Content from nodeJS",
+        format:"string"
+    };
+    it("should receive string content as a response", async function(){
+        const response = await request.post("/return").send(JSON.stringify(mockData))
+        expect(response.type).toBe("text/plain");
+    });
+})
+
 describe("Should POST data to the endpoint and return ",function(){
     const mockData = {
         "data":{
@@ -19,15 +30,9 @@ describe("Should POST data to the endpoint and return ",function(){
         "format":"html",
     }
 
-    it("Should send data to the endpoint", async function(){
-        const res = await request.post("/return").send(JSON.stringify(mockData));
-        // console.log(`$test -- StatusCode: ${res.statusCode}`);
-        // console.log(`$test -- Status: ${res.status}`);
-        // console.log(`$test -- StatusType: ${res.statusType}`);
-        // console.log(`$test -- StatusInfo: ${res.info}`);
-        // console.log(`$test -- Type: ${res.type}`);
-        // console.log(`$test -- Headers: ${res.headers}`);
-        // console.log(`$test -- Path: ${res.path}`);
+    it("Should send data to the endpoint and return html", async function(){
+        const res = await request.post("/html").send(JSON.stringify(mockData));
+        expect(res.type).toBe("text/html");
     });
 })
 

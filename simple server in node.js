@@ -1,5 +1,5 @@
-let {readFileSync, writeFileSync} = require("fs");
-let template = readFileSync(`${__dirname}/template.html`, {encoding:'utf-8'});
+let {readFile, writeFile} = require("fs");
+
 let http = require("http");
 let supertest = require("supertest");
 
@@ -19,34 +19,41 @@ let reqOptions = {
 function handleGETRequest(){
 
 }
-async function  handleFormatting(body, response){
+
+async function handleFormatting(body, response){
+    
     const {format , data} = JSON.parse(body);
-    if(format === "string") {
+    if(format === "text") {
         sendResponse( {   
-            content:`${greeting}, ${age},${occupation}`,
+            content:data,
             format:`text/plain`
         }, response)
     }
     if(format === "html"){
-        for(const [k,v] of Object.entries(data)){    
-            template = template.replace(`{${k}}`, v);
-        }
-        await writeFileSync(`${__dirname}/update.html`, template);    
-        sendResponse({
-            content:data,
-            format:`text/html`
-        }, response);
+             readFile(`${__dirname}/template.html`, {encoding:'utf-8'}, function(error,template){
+            if(error) throw error;
+            for(const [k,v] of Object.entries(data)){
+                template = template.replace(`{${k}}`, v);
+            }
+            writeFile(`${__dirname}/update.html`, template, function(error){
+                if(error) throw error;
+                sendResponse({
+                    content:template,
+                    format:`text/html`
+                }, response);
+            });
+
+        });
     } 
     if(format === "json"){
         sendResponse({
             content:{
                 format:`JSON`,
-                ...data,
+                data,
             },
             format:`application/json`
         }, response);
     }
-    
 }
 
 function sendResponse({content,format}, response){
@@ -61,15 +68,12 @@ function handlePOSTRequest(request, response){
     request.on(`data`, function(chunk){
         body += chunk;
     });
-
     request.on(`error`, function(error){
         console.log(`problem with request:${error.message}`);
     });
     request.on(`end`, function(){
         handleFormatting(body, response);
     })
-
-   
 }
 
 let server = http.createServer(function(request, response){

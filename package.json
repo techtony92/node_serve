@@ -4,7 +4,8 @@
   "description": "",
   "main": "simple server in node.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "dev":"node simple\\ server\\ in\\ node"
   },
   "keywords": [],
   "author": "",
