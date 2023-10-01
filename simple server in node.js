@@ -19,24 +19,44 @@ let reqOptions = {
 function handleGETRequest(){
 
 }
-function handleFormatting(body){
+async function  handleFormatting(body, response){
     const {format , data} = JSON.parse(body);
-    console.log(data);
-    if(format === "string") 
-        return {   
+    if(format === "string") {
+        sendResponse( {   
             content:`${greeting}, ${age},${occupation}`,
             format:`text/plain`
-        };
-    if(format === "html")
-        
-        return {
+        }, response)
+    }
+    if(format === "html"){
+        for(const [k,v] of Object.entries(data)){    
+            template = template.replace(`{${k}}`, v);
+        }
+        await writeFileSync(`${__dirname}/update.html`, template);    
+        sendResponse({
             content:data,
             format:`text/html`
-        }
+        }, response);
+    } 
+    if(format === "json"){
+        sendResponse({
+            content:{
+                format:`JSON`,
+                ...data,
+            },
+            format:`application/json`
+        }, response);
+    }
     
 }
 
-function handlerPOSTRequest(request, response){
+function sendResponse({content,format}, response){
+        response.writeHead(200, {'Content-Type': `${format}`});
+        response.write(JSON.stringify(content));
+        response.end();
+}
+
+function handlePOSTRequest(request, response){
+    console.log(`Server Working Success`);
     let body = "";
     request.on(`data`, function(chunk){
         body += chunk;
@@ -45,31 +65,18 @@ function handlerPOSTRequest(request, response){
     request.on(`error`, function(error){
         console.log(`problem with request:${error.message}`);
     });
-    console.log(`Server Working Success`);
-    request.on(`end`, async function(){
-        
-        let {content, format} = handleFormatting(body);
-        // let data = {
-        //     greeting:`Good Day Tony!`,
-        // }
-        for(const [k,v] of Object.entries(content)){
-            
-            template = template.replace(`{${k}}`, v);
+    request.on(`end`, function(){
+        handleFormatting(body, response);
+    })
 
-        } 
-        await writeFileSync(`${__dirname}/update.html`, template);
-       
-        response.writeHead(200, {'Content-Type': `text/html`});
-        response.write(JSON.stringify(content));
-        response.end();
-    });
+   
 }
 
 let server = http.createServer(function(request, response){
     const {headers, method, url} = request;
   
     if(request.method === "POST"){
-        handlerPOSTRequest(request, response);
+        handlePOSTRequest(request, response);
         console.log('POST');
     }
 });

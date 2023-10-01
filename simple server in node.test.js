@@ -30,3 +30,21 @@ describe("Should POST data to the endpoint and return ",function(){
         // console.log(`$test -- Path: ${res.path}`);
     });
 })
+
+describe("Should POST data to the endpoint and return a JSON format response", function(){
+    const mockData = {
+        "data":{
+            "greeting":"Good Day Tony!",
+        },
+        "format":"json",
+    }
+    it("Should send data to the endpoint using application/json header and return a json response", async function(){
+         const res = await request.post(`/json`).send(JSON.stringify(mockData));
+         expect(res.statusCode).toBe(200);
+         expect(res.status).toBe(200);
+         expect(res.ok).toBeTruthy();
+         expect(res.type).toBe("application/json");
+         expect(res._body).toHaveProperty(`greeting`,`Good Day Tony!`);
+    })
+})
+
